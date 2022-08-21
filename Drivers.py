@@ -1,4 +1,6 @@
 # import libraries
+import os
+
 import numpy as np
 from bs4 import BeautifulSoup
 
@@ -12,7 +14,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 import matplotlib.pyplot as plt
 
-cred = credentials.Certificate("formula-1-database-8667e-firebase-adminsdk-5nb6j-fb676ac809.json")
+cred = credentials.Certificate(os.getenv('CREDENTIALS'))
 firebase_admin.initialize_app(cred)
 
 firestore_db = firestore.client()
