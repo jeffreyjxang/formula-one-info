@@ -26,19 +26,21 @@ soup = BeautifulSoup(page.content, "html.parser")
 # find each item DIV
 firstnames = soup.findAll("span", attrs={"class": "d-block f1--xxs f1-color--carbonBlack"})
 lastnames = soup.findAll("span", attrs={"class": "d-block f1-bold--s f1-color--carbonBlack"})
+currentPoints = soup.findAll("div", attrs={"class": "f1-wide--s"})
+
 
 print(len(firstnames))
 counter = 0
 list = []
 while counter < len(firstnames):
     list.insert(counter,([firstnames[counter].text.strip() + " " + lastnames[counter].text.strip(), (str(firstnames[counter].text.strip().lower()) + "-" +
-                         str(lastnames[counter].text.strip().lower())), counter]))
+                         str(lastnames[counter].text.strip().lower())), currentPoints[counter].text.strip().lower(), counter]))
     counter = counter + 1
 
 for i in list:
     print(i)
 print(len(list))
-for capital, name, driverIndex in list:
+for capital, name, currentPoints, driverIndex in list:
     page = requests.get("https://www.formula1.com/en/drivers/" + name + ".html")
 
     # parse the html using beautiful soup and store in variable `soup`
@@ -49,27 +51,28 @@ for capital, name, driverIndex in list:
         infobox = soup.find("table", attrs={"class": "stat-list"})
         topic = infobox.findAll(attrs={"class" : "text"})
         values = infobox.findAll(attrs={"class" : "stat-value"})
-        combinedString = str(capital + str(": "))
-        counter = 0
-        while (counter < len(topic)):
-            combinedString += "\n " + topic[counter].text.strip()  + ": " + values[counter].text.strip()
-            counter = counter + 1
+
+
+        infoboxkey = soup.find("table", attrs={"class": "stat-list"})
+        topickey = infobox.findAll(attrs={"class" : "text"})
 
         values = [value.text.strip() for value in values]
+        keys = [key.text.strip() for key in topickey]
 
         driverYOB = 2022 - int((values[8])[-4:])
         data = {
-            u'Team': values[0],
-            u'Country': values[1],
-            u'Podiums': values[2],
-            u'Points': values[3],
-            u'Grands Prix entered': values[4],
-            u'World Championships': values[5],
-            u'Highest race finish': values[6],
-            u'Highest grid position': values[7],
-            u'Date of birth': values[8],
-            u'Place of birth': values[9],
-            u'driverIndex': driverIndex,
+            keys[0]: values[0],
+            keys[1]: values[1],
+            keys[2]: values[2],
+            keys[3]: values[3],
+            u'Current Points': currentPoints,
+            keys[4]: values[4],
+            keys[5]: values[5],
+            keys[6]: values[6],
+            keys[7]: values[7],
+            keys[8]: values[8],
+            keys[9]: values[9],
+            u'Driver Index': driverIndex,
 
         }
         x = int(driverYOB)
